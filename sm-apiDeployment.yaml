@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-manager-api
+  labels:
+    app: secret-manager-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secret-manager-api
+  template:
+    metadata:
+      labels:
+        app: secret-manager-api
+    spec:
+      serviceAccountName: sm-service-account
+      containers:
+      - name: sm-backend
+        image: pra1tik/sm-go:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SECRET_PREFIX
+          value: "sm-"
+
+

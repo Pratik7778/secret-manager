@@ -1,0 +1,17 @@
+# hgj
+apiVersion: v1
+kind: Service
+metadata:
+  name: sm-frontend-service
+spec:
+  selector:
+    app: secret-manager-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+
+
+#role, rolebinding(cluster)
+#serviceaccount, users, group

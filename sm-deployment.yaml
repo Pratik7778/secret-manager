@@ -1,0 +1,92 @@
+# service account for the api-pod
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sm-service-account
+  namespace: default
+
+
+---
+# Cluster role for api-pod to give permissions for secret, namespace resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sm-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - namespaces
+  verbs:
+  - "*"
+
+
+---
+# Cluster role binding to assign ClusterRole to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sm-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sm-role
+subjects:
+- kind: ServiceAccount
+  name: sm-service-account
+  namespace: default
+
+
+---
+# api deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-manager-api
+  labels:
+    app: secret-manager-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secret-manager-api
+  template:
+    metadata:
+      labels:
+        app: secret-manager-api
+    spec:
+      serviceAccountName: sm-service-account
+      containers:
+      - name: sm-backend
+        image: pra1tik/sm-go:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SECRET_PREFIX
+          value: "sm-"
+
+
+---
+# frontend deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secret-manager-frontend
+  labels:
+    app: secret-manager-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: secret-manager-frontend
+  template:
+    metadata:
+      labels:
+        app: secret-manager-frontend
+    spec:
+      containers:
+      - name: sm-frontend
+        image: pra1tik/sm-node:latest
+        ports:
+        - containerPort: 80

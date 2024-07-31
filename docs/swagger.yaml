@@ -1,0 +1,294 @@
+definitions:
+  models.Secret:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  models.UpdateSecret:
+    properties:
+      value:
+        type: string
+    type: object
+  models.User:
+    properties:
+      password:
+        type: string
+      user:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  response.ListResponse:
+    properties:
+      page_number:
+        type: integer
+      page_size:
+        type: integer
+      query:
+        type: string
+      secrets:
+        items:
+          type: string
+        type: array
+      total:
+        type: integer
+    type: object
+  response.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  response.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact:
+    email: info@sercretmanager.com
+  description: This is a Secret-Manager-API server.
+  termsOfService: http://swagger.io/terms/
+  title: Secret Manager API
+  version: "2.0"
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Show Secret Manager home page message
+      tags:
+      - Home
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login existing user in the secret manager
+      parameters:
+      - description: User details in JSON format
+        in: body
+        name: detail
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login existing users
+      tags:
+      - Login
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user in the secret manager
+      parameters:
+      - description: User details in JSON format
+        in: body
+        name: detail
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Registration
+  /secrets:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Query parameter for search
+        in: query
+        name: q
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List secrets page
+      tags:
+      - List Secrets
+  /secrets/{secret_name}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete secret in the user's namespace
+      parameters:
+      - description: Secret name
+        in: path
+        name: secret_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete secret
+      tags:
+      - Delete Secret
+    get:
+      consumes:
+      - application/json
+      description: View secret value in the user's namespace
+      parameters:
+      - description: Secret name
+        in: path
+        name: secret_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: View secret
+      tags:
+      - View Secret
+    put:
+      consumes:
+      - application/json
+      description: Update secret in the user's namespace
+      parameters:
+      - description: Secret name
+        in: path
+        name: secret_name
+        required: true
+        type: string
+      - description: Secret value in JSON format
+        in: body
+        name: detail
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSecret'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update secret
+      tags:
+      - Update Secret
+  /secrets/create:
+    post:
+      consumes:
+      - application/json
+      description: Create secret in the user's namespace
+      parameters:
+      - description: Secret details in JSON format
+        in: body
+        name: detail
+        required: true
+        schema:
+          $ref: '#/definitions/models.Secret'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create secret
+      tags:
+      - Create Secret
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
